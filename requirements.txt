@@ -1,0 +1,6 @@
+django==3.0.3
+python-ipmi==0.4.2
+django-cryptography==1.0
+uuid==1.30
+django-tables2==2.3.1
+apscheduler==3.6.3

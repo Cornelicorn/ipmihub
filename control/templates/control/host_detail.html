@@ -1,0 +1,43 @@
+{% extends "control/base.view.html" %}
+{% load control_filters %}
+{% load humanize %}
+
+{% block title %} {{object.name}} {% endblock title %}
+{% block page-pretitle %} Host Detail View {% endblock page-pretitle %}
+{% block page-title %}
+    {{object.name}} {% if object.hostname %} - {{object.hostname}} {% endif %}
+{% endblock page-title %}
+
+{% block content %}
+    <div>
+        <span class="badge
+        {% if object.online %}
+            bg-green"> Power Status <span class="badge-addon ">Online</span>
+        {% else %}
+            bg-red"> Power Status <span class="badge-addon ">Offline</span>
+        {% endif %} </span>
+    
+        <span class="badge
+        {% if object.errors %}
+            bg-red"> Errors 
+            {% for error in object.errors %} <span class="badge-addon "> {{error|snakeToTitle}} </span> {% endfor %}
+        {% else %}
+            bg-green"> No errors
+        {% endif %} </span>
+    </div>
+    <div>
+        <span class="badge bg-blue">
+            Last Seen<span class="badge-addon"> {{ object.powerStatus.time|naturaltime }} </span>
+        </span>
+    </div>
+    <div>
+        <span class="badge">
+            Restore Policy<span class="badge-addon"> {{ object.powerValues.restore_policy|title }} </span>
+        </span>
+    </div>
+    <div>
+        <span class="badge">
+            Last Event<span class="badge-addon"> {{ object.powerValues.last_event|title }} </span>
+        </span>
+    </div>
+{% endblock content %}

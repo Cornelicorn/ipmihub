@@ -1,0 +1,24 @@
+{% extends "control/base.html" %}
+
+{% block body %}
+<div class="antialiased">
+    <div class="page">
+        {% include "control/header.html" %}
+        <div class="content">
+            <div class="container">
+                <div class="page-header">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="page-pretitle"> {% block page-pretitle %} {% endblock page-pretitle %} </div>
+                            <h2 class="page-title"> {% block page-title %} {% endblock page-title %} </h2>
+                        </div>
+                    </div>
+                </div>
+                {% block content %} {% endblock content %}
+            </div>
+        </div>
+    </div>
+</div> 
+{% endblock body %}
+    
+
