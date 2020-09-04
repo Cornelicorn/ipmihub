@@ -20,5 +20,5 @@ class HostTable(tables.Table):
                   'hostname',
                   'cred',
                   'online',
-                  'errors'
+                  'errors',
                   )

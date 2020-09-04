@@ -1,9 +1,11 @@
 import uuid
 from django.db import models
 from django_cryptography.fields import encrypt
+import datetime
 from django.utils import timezone
 from control.ipmi.rmcp import chassisStatus
 from .utils import restore_int_to_str, last_event_str_converter
+from ipmihub.env import downtime_delay
 
 
 
@@ -52,11 +54,12 @@ class Host(models.Model):
     def errors(self):
         errors = []
         for key in self.powerStatus().errorFieldNames():
-            errors.append(key) if self.powerValues()[key] else ''
+            if self.powerValues()[key]: errors.append(key) 
+        if self.timeout(): errors.append('timeout')
         errors.sort()
         return errors
     def timeout(self):
-        return True #TODO: check if last time is bigger than env.py timeout
+        return self.powerStatus().time <= timezone.now() - datetime.timedelta(seconds=downtime_delay)
     
 class PowerStatus(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
