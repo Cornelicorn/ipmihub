@@ -40,4 +40,41 @@
             Last Event<span class="badge-addon"> {{ object.powerValues.last_event|title }} </span>
         </span>
     </div>
+    <hr/>
+    <div class="row">
+        {% csrf_token %}
+
+        <div class="col">
+        <form method="post" action="{% url 'powercontrol' object.id %}"> 
+        {% if object.online %}
+            <input type="hidden" name="command" value=0>
+            <button type="submit" class="btn btn-danger btn-block" value='power-off'>Power off</button>
+        {% else %}
+            <input type="hidden" name="command" value=1>
+            <button type="submit" class="btn btn-success btn-block" value='power-on'>Power on</button>
+        {% endif %}
+        </form>
+        </div>
+
+        <div class="col">
+        <form method="post" action="{% url 'powercontrol' object.id %}"> 
+        <input type="hidden" name="command" value=2>
+        <button type="submit" class="btn btn-danger btn-block" value='power-cycle'>Power Cycle</button>
+        </form>
+        </div>
+
+        <div class="col">
+        <form method="post" action="{% url 'powercontrol' object.id %}"> 
+        <input type="hidden" name="command" value=3>
+        <button type="submit" class="btn btn-danger btn-block" value='power-reset'>Reset</button>
+        </form>
+        </div>
+        
+        <div class="col">
+        <form method="post" action="{% url 'powercontrol' object.id %}">
+        <input type="hidden" name="command" value=5>
+        <button type="submit" class="btn btn-info btn-block" value='power-shutdown'>Orderly Shutdown</button>
+        </form>
+        </div>
+    </div>
 {% endblock content %}

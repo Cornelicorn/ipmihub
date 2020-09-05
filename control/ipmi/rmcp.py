@@ -30,16 +30,20 @@ def chassisStatus(host,port,user,password):
     return status
 
 def chassisCommand(host, port, user, password, command: int):
+    """
+        Send chassis command to host:port using user and password as authentication.
+        command is an integer, with the following mapping:
+        {
+        0: 'CONTROL_POWER_DOWN',
+        1: 'CONTROL_POWER_UP',
+        2: 'CONTROL_POWER_CYCLE',
+        3: 'CONTROL_HARD_RESET',
+        4: 'CONTROL_DIAGNOSTIC_INTERRUPT',
+        5: 'CONTROL_SOFT_SHUTDOWN',
+        }
+    """
     try:
         ipmi = createSession(host, port, user, password)
     except socket.timeout as e:
         raise e
-    power_int_dict = {
-                     0 :'CONTROL_POWER_DOWN',
-                     1: 'CONTROL_POWER_UP',
-                     2: 'CONTROL_POWER_CYCLE',
-                     3: 'CONTROL_HARD_RESET',
-                     4: 'CONTROL_DIAGNOSTIC_INTERRUPT',
-                     5: 'CONTROL_SOFT_SHUTDOWN',
-                     }
-    ipmi.chassis_control(power_int_dict[command])
+    ipmi.chassis_control(command)
