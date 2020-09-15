@@ -42,9 +42,9 @@ class Host(models.Model):
     def connection(self):
         return self.ip if self.ipC else self.hostname
     def powerStatus(self):
-        return self.powerstatus_set.first()
+        return PowerStatus.objects.filter(host = self, timeout=False).first()
     def powerValues(self):
-        status = self.powerstatus_set.first()
+        status = self.powerStatus()
         values = { i: status.__dict__[i] for i in status.fieldNames() }
         values['restore_policy'] = restore_int_to_str(values['restore_policy'])
         values['last_event'] = last_event_str_converter(values['last_event'])
@@ -55,27 +55,29 @@ class Host(models.Model):
         errors = []
         for key in self.powerStatus().errorFieldNames():
             if self.powerValues()[key]: errors.append(key) 
-        if self.timeout(): errors.append('timeout')
         errors.sort()
+        if self.timeout(): errors.append('timeout')
         return errors
     def timeout(self):
-        return self.powerStatus().time <= timezone.now() - datetime.timedelta(seconds=downtime_delay)
+        status = self.powerstatus_set.first()
+        return True if status.timeout else False
     
 class PowerStatus(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     time = models.DateTimeField(auto_now=True)
+    timeout = models.BooleanField(default=False)
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
-    power_on = models.BooleanField()
-    overload = models.BooleanField()
-    interlock = models.BooleanField()
-    fault = models.BooleanField()
-    control_fault = models.BooleanField()
-    restore_policy = models.IntegerField()
-    last_event = models.CharField(max_length=17)
-    intrusion = models.BooleanField()
-    front_panel_lockout = models.BooleanField()
-    drive_fault = models.BooleanField()
-    cooling_fault = models.BooleanField()
+    power_on = models.BooleanField(null=True)
+    overload = models.BooleanField(null=True)
+    interlock = models.BooleanField(null=True)
+    fault = models.BooleanField(null=True)
+    control_fault = models.BooleanField(null=True)
+    restore_policy = models.IntegerField(null=True)
+    last_event = models.CharField(max_length=17, null=True)
+    intrusion = models.BooleanField(null=True)
+    front_panel_lockout = models.BooleanField(null=True)
+    drive_fault = models.BooleanField(null=True)
+    cooling_fault = models.BooleanField(null=True)
     def fieldNames(self):
         return set([field.name for field in self._meta.get_fields(include_parents=False)]) ^ {'id','time','host'}
     def errorFieldNames(self):

@@ -6,10 +6,12 @@ def updateChassisStatus(hostId):
     host = Host.objects.get(pk=hostId)
     try:
         state = chassisStatus(host.connection(),host.port,host.cred.username,host.cred.password)
-    except socket.timeout as e:
-        raise e
-    q = PowerStatus(host = host, **state)
-    q.save()
+        q = PowerStatus(host = host, **state)
+        q.save()
+    except socket.timeout:
+        q = PowerStatus(host = host, timeout=True)
+        q.save()
+    
 
 def updateAllHostStatus():
     for host in Host.objects.all():
