@@ -13,6 +13,7 @@ class HostTable(tables.Table):
     errors = tables.BooleanColumn(yesno ='\u2718,-', attrs={'td': {'class': error_format}})
     name = tables.LinkColumn('host', args=[A('pk')])
     class Meta:
+        order_by = 'ip'
         model = Host
         template_name = 'django_tables2/bootstrap.html'
         fields = ('name',
