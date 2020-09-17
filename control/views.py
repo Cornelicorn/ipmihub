@@ -23,7 +23,7 @@ def powerControl(request, pk):
     command = int(request.POST['command'])
     try:
         rmcp.chassisCommand(host.connection(), host.port, host.cred.username, host.cred.password, command)
-        updateChassisStatus(pk)
+        updateChassisStatus(host)
     except socket.timeout as e:
         raise e
     return HttpResponseRedirect(reverse('host', args=(host.id,)))

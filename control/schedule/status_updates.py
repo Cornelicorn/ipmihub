@@ -2,8 +2,7 @@ from control.models import Host, PowerStatus
 from control.ipmi.rmcp import chassisStatus
 import socket
 
-def updateChassisStatus(hostId):
-    host = Host.objects.get(pk=hostId)
+def updateChassisStatus(host):
     try:
         state = chassisStatus(host.connection(),host.port,host.cred.username,host.cred.password)
         q = PowerStatus(host = host, **state)
@@ -15,5 +14,4 @@ def updateChassisStatus(hostId):
 
 def updateAllHostStatus():
     for host in Host.objects.all():
-        updateChassisStatus(host.id)
-    
+        updateChassisStatus(host)
