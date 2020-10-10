@@ -8,7 +8,6 @@ from .utils import restore_int_to_str, last_event_str_converter
 from ipmihub.env import downtime_delay
 
 
-
 class Credential(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length = 200)
@@ -22,7 +21,6 @@ class Credential(models.Model):
     priv = models.IntegerField(choices = AccessLevels, default = 4)
     def __str__(self):
         return self.name
-    
 
 
 class Host(models.Model):
@@ -61,7 +59,10 @@ class Host(models.Model):
     def timeout(self):
         status = self.powerstatus_set.first()
         return True if status.timeout else False
-    
+    def sensorSetting(self, sensor_id):
+        return self.sensorsetting_set.filter(sensor_id = sensor_id).first()
+
+
 class PowerStatus(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     time = models.DateTimeField(auto_now=True)
@@ -86,3 +87,28 @@ class PowerStatus(models.Model):
         ordering = ['-time']
 
 
+class SensorSetting(models.Model):
+    time = models.DateTimeField(auto_now=True)
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
+    sensor_id = models.IntegerField()
+    thresholds_unr = models.FloatField(null=True)
+    thresholds_ucr = models.FloatField(null=True)
+    thresholds_unc = models.FloatField(null=True)
+    thresholds_lnc = models.FloatField(null=True)
+    thresholds_lcr = models.FloatField(null=True)
+    thresholds_lnr = models.FloatField(null=True)
+    class Meta:
+        ordering = ['-time']
+
+class SensorStatus(models.Model):
+    time = models.DateTimeField(auto_now=True)
+    timeout = models.BooleanField(default=False)
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
+
+class SensorReading(models.Model):
+    sensor_status = models.ForeignKey(SensorStatus, on_delete=models.CASCADE)
+    sensor_id = models.IntegerField()
+    raw_value = models.IntegerField(null=True)
+    sensor_name = models.CharField(max_length = 255)
+    value = models.FloatField(null=True)
+    state = models.IntegerField(null=True)

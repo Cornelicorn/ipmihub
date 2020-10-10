@@ -47,3 +47,54 @@ def chassisCommand(host, port, user, password, command: int):
     except socket.timeout as e:
         raise e
     ipmi.chassis_control(command)
+
+def sensorStatus(host, port, user, password):
+    try:
+        ipmi = createSession(host, port, user, password)
+    except socket.timeout as e:
+        raise e
+
+    status = []
+    iter_fct = None
+    device_id = ipmi.get_device_id()
+    if device_id.supports_function('sdr_repository'):
+        iter_fct = ipmi.sdr_repository_entries
+    elif device_id.supports_function('sensor'):
+        iter_fct = ipmi.device_sdr_entries
+    
+    for s in iter_fct():
+        try:
+            number = None
+            value = None
+            states = None
+            thresholds = None
+            def thresholds_conv(sensor):
+                thr = ipmi.get_sensor_thresholds(sensor.number)
+                if thr is not None:
+                    for thr_id, thr_val in thr.items():
+                        thr[thr_id]=float(round(sensor.convert_sensor_raw_to_value(thr_val),4))
+                return thr
+
+            if s.type is pyipmi.sdr.SDR_TYPE_FULL_SENSOR_RECORD:
+                (value, states) = ipmi.get_sensor_reading(s.number)
+                number = s.number
+                if value is not None:
+                    value = float(round(s.convert_sensor_raw_to_value(value),4))
+                thresholds = thresholds_conv(s)
+
+            elif s.type is pyipmi.sdr.SDR_TYPE_COMPACT_SENSOR_RECORD:
+                (value, states) = ipmi.get_sensor_reading(s.number)
+                number = s.number
+
+            status.append({
+                'sensor_id': s.id,
+                'raw_value': number if number else None,
+                'sensor_name': s.device_id_string.decode('utf-8'),
+                'value': value,
+                'state': states if states else None,
+                'thresholds': thresholds
+                })
+                
+        except pyipmi.errors.CompletionCodeError as e:
+            pass
+    return status
