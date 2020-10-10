@@ -18,7 +18,9 @@ def updateSensorStatus(host):
         sensor_status.save()
         for dict in state:
             thresholds = dict['thresholds']
+            sensor_name = dict['sensor_name']
             del dict['thresholds']
+            del dict['sensor_name']
             for key in ['unr', 'ucr', 'unc', 'lnc', 'lcr', 'lnr']:
                 globals()['thresholds_' + key] = thresholds[key] if thresholds else None
 
@@ -30,7 +32,8 @@ def updateSensorStatus(host):
                                         thresholds_unc = thresholds_unc,
                                         thresholds_lnc = thresholds_lnc,
                                         thresholds_lcr = thresholds_lcr,
-                                        thresholds_lnr = thresholds_lnr)
+                                        thresholds_lnr = thresholds_lnr,
+                                        sensor_name = sensor_name)
                 settings.save()
             
             q = SensorReading(sensor_status = sensor_status, **dict)
