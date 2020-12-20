@@ -1,5 +1,5 @@
-# Update interval for status in seconds
-refresh_interval = 30
+# Update interval for status in seconds, set to -1 to disable
+refresh_interval = -1
 # Time in seconds after which a host is interpreted as down if no status update has been received
 downtime_delay = 300
 
