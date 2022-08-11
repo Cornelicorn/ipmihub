@@ -1,4 +1,4 @@
-django==4.0.6
+django==4.0.7
 python-ipmi==0.5.2
 django-cryptography==1.0
 django-tables2==2.4.1
