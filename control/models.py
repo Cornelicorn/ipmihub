@@ -43,22 +43,29 @@ class Host(models.Model):
         return PowerStatus.objects.filter(host = self, timeout=False).first()
     def powerValues(self):
         status = self.powerStatus()
-        values = { i: status.__dict__[i] for i in status.fieldNames() }
-        values['restore_policy'] = restore_int_to_str(values['restore_policy'])
-        values['last_event'] = last_event_str_converter(values['last_event'])
-        return values
+        if status is not None:
+            values = { i: status.__dict__[i] for i in status.fieldNames() }
+            values['restore_policy'] = restore_int_to_str(values['restore_policy'])
+            values['last_event'] = last_event_str_converter(values['last_event'])
+            return values
+        return None
     def online(self):
-        return self.powerValues()['power_on']
+        if self.powerValues() is not None:
+            return self.powerValues()['power_on']
+        return None
     def errors(self):
         errors = []
-        for key in self.powerStatus().errorFieldNames():
-            if self.powerValues()[key]: errors.append(key) 
+        if self.powerStatus() is not None:
+            for key in self.powerStatus().errorFieldNames():
+                if self.powerValues()[key]: errors.append(key)
         errors.sort()
         if self.timeout(): errors.append('timeout')
         return errors
     def timeout(self):
-        status = self.powerstatus_set.first()
-        return True if status.timeout else False
+        if self.powerStatus() is not None:
+            status = self.powerstatus_set.first()
+            return True if status.timeout else False
+        return None
     def sensorSetting(self, sensor_id):
         return self.sensorsetting_set.filter(sensor_id = sensor_id).first()
 
