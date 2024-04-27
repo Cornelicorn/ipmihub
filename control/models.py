@@ -1,11 +1,6 @@
 import uuid
 from django.db import models
-from django_cryptography.fields import encrypt
-import datetime
-from django.utils import timezone
-from control.ipmi.rmcp import chassisStatus
 from .utils import restore_int_to_str, last_event_str_converter
-from ipmihub.env import downtime_delay
 
 
 class Credential(models.Model):
