@@ -12,7 +12,7 @@ class Credential(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length = 200)
     username = models.CharField(max_length = 20)
-    password = encrypt(models.CharField(max_length = 20))
+    password = models.CharField(max_length = 20)
     AccessLevels = [
         (2, 'User'),
         (3, 'Operator'),
